@@ -43,15 +43,16 @@ export const Hero = () => {
           >
             <Button 
               size="lg" 
-              className="bg-secondary hover:bg-secondary/90 text-secondary-foreground font-heading font-semibold text-lg px-8 py-6 rounded-full shadow-soft transition-all hover:scale-105"
+              variant="secondary"
+              className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
             >
               Get Started
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button 
               size="lg" 
-              variant="outline" 
-              className="border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
+              variant="outline-light"
+              className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
             >
               <PlayCircle className="mr-2 h-5 w-5" />
               View Demo
