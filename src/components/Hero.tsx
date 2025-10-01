@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, PlayCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
 
 export const Hero = () => {
@@ -45,14 +46,18 @@ export const Hero = () => {
               size="lg" 
               variant="secondary"
               className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
+              asChild
             >
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/dashboard">
+                Get Started
+                <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
             </Button>
             <Button 
               size="lg" 
               variant="outline-light"
               className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
+              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
             >
               <PlayCircle className="mr-2 h-5 w-5" />
               View Demo
