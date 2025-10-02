@@ -147,6 +147,7 @@ const childrenData = [
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [childSearchQuery, setChildSearchQuery] = useState("");
 
   // Placeholder handlers for future backend integration
   const handleSearch = () => {
@@ -199,6 +200,12 @@ const Dashboard = () => {
         return status;
     }
   };
+
+  // Filter children based on search query
+  const filteredChildren = childrenData.filter((child) =>
+    child.name.toLowerCase().includes(childSearchQuery.toLowerCase()) ||
+    child.id.toLowerCase().includes(childSearchQuery.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-gradient-subtle">
@@ -368,6 +375,27 @@ const Dashboard = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
+              {/* Search Bar */}
+              <motion.div
+                className="mb-6"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="w-full md:w-1/3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                    <Input
+                      type="text"
+                      placeholder="Search by child name or ID…"
+                      value={childSearchQuery}
+                      onChange={(e) => setChildSearchQuery(e.target.value)}
+                      className="pl-10 border-border rounded-lg shadow-sm"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+
               <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
@@ -379,7 +407,8 @@ const Dashboard = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {childrenData.map((child, index) => (
+                    {filteredChildren.length > 0 ? (
+                      filteredChildren.map((child, index) => (
                       <motion.tr
                         key={child.id}
                         initial={{ opacity: 0, x: -20 }}
@@ -427,7 +456,16 @@ const Dashboard = () => {
                           </Link>
                         </TableCell>
                       </motion.tr>
-                    ))}
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8">
+                          <p className="text-muted-foreground">
+                            No children found matching "{childSearchQuery}"
+                          </p>
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableBody>
                 </Table>
               </div>
