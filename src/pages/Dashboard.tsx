@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Search,
@@ -11,11 +12,20 @@ import {
   Bot,
   Syringe,
   Activity,
+  Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 // Mock data for stats cards
 const statsData = [
@@ -86,6 +96,52 @@ const recentActivity = [
     text: "Report uploaded for Aarav Kumar",
     date: "Sept 24, 2025",
     status: "ok",
+  },
+];
+
+// Mock data for children overview
+const childrenData = [
+  {
+    id: "rahul-kumar",
+    name: "Rahul Kumar",
+    age: 8,
+    healthAlert: "⚠️ Vaccine due",
+    alertType: "warning",
+  },
+  {
+    id: "ananya-sharma",
+    name: "Ananya Sharma",
+    age: 6,
+    healthAlert: "✅ All up to date",
+    alertType: "ok",
+  },
+  {
+    id: "rohan-gupta",
+    name: "Rohan Gupta",
+    age: 10,
+    healthAlert: "⚠️ Vaccine overdue",
+    alertType: "overdue",
+  },
+  {
+    id: "priya-singh",
+    name: "Priya Singh",
+    age: 7,
+    healthAlert: "⚠️ Allergy flagged",
+    alertType: "warning",
+  },
+  {
+    id: "aarav-patel",
+    name: "Aarav Patel",
+    age: 9,
+    healthAlert: "✅ All up to date",
+    alertType: "ok",
+  },
+  {
+    id: "kavya-reddy",
+    name: "Kavya Reddy",
+    age: 5,
+    healthAlert: "✅ All up to date",
+    alertType: "ok",
   },
 ];
 
@@ -297,6 +353,89 @@ const Dashboard = () => {
           </Card>
         </motion.section>
 
+        {/* Children Overview Section */}
+        <motion.section
+          className="mb-10"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Users className="h-6 w-6 text-primary" />
+                Children Overview
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Child Name</TableHead>
+                      <TableHead>Age</TableHead>
+                      <TableHead>Health Alert</TableHead>
+                      <TableHead className="text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {childrenData.map((child, index) => (
+                      <motion.tr
+                        key={child.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.05 * index }}
+                        className="group"
+                      >
+                        <TableCell className="font-medium">
+                          {child.name}
+                        </TableCell>
+                        <TableCell>{child.age}</TableCell>
+                        <TableCell>
+                          <span
+                            className={`inline-flex items-center ${
+                              child.alertType === "ok"
+                                ? "text-primary"
+                                : child.alertType === "overdue"
+                                ? "text-destructive"
+                                : "text-secondary"
+                            }`}
+                          >
+                            {child.healthAlert}
+                          </span>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Link to={`/child/${child.id}`}>
+                            <motion.div
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              <Button
+                                variant={
+                                  child.alertType === "overdue"
+                                    ? "destructive"
+                                    : child.alertType === "warning"
+                                    ? "secondary"
+                                    : "default"
+                                }
+                                size="sm"
+                              >
+                                <Eye className="h-4 w-4 mr-2" />
+                                View Profile
+                              </Button>
+                            </motion.div>
+                          </Link>
+                        </TableCell>
+                      </motion.tr>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+              {/* TODO: Later this will be backed by /api/children */}
+            </CardContent>
+          </Card>
+        </motion.section>
+
         {/* Main Content Grid: Recent Activity + AI Insights */}
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Recent Activity / Alerts List */}
@@ -304,7 +443,7 @@ const Dashboard = () => {
             className="lg:col-span-2"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
           >
             <Card className="shadow-card">
               <CardHeader>
@@ -346,7 +485,7 @@ const Dashboard = () => {
           <motion.aside
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
           >
             <Card className="shadow-card bg-gradient-to-br from-accent-light to-primary-light dark:from-accent/10 dark:to-primary/10">
               <CardHeader>
