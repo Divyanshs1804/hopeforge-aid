@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import ChildProfile from "./pages/ChildProfile";
 import UploadReport from "./pages/UploadReport";
+import SignIn from "./pages/SignIn";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -19,6 +20,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/signin" element={<SignIn />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/child/:id" element={<ChildProfile />} />
           <Route path="/child/:id/upload-report" element={<UploadReport />} />
