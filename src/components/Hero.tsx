@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, PlayCircle } from "lucide-react";
+import { ArrowRight, PlayCircle, LogIn } from "lucide-react";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-image.jpg";
 
@@ -48,9 +48,9 @@ export const Hero = () => {
               className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
               asChild
             >
-              <Link to="/dashboard">
-                Get Started
-                <ArrowRight className="ml-2 h-5 w-5" />
+              <Link to="/signin">
+                <LogIn className="mr-2 h-5 w-5" />
+                Sign In / Create Account
               </Link>
             </Button>
             <Button 
