@@ -672,15 +672,16 @@ const ChildProfile = () => {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
-                      <Button
-                        onClick={handleUploadReport}
-                        variant="default"
-                        size="lg"
-                        className="w-full"
-                      >
-                        <Upload className="h-5 w-5 mr-2" />
-                        Upload Report
-                      </Button>
+                      <Link to={`/child/${id}/upload-report`}>
+                        <Button
+                          variant="default"
+                          size="lg"
+                          className="w-full"
+                        >
+                          <Upload className="h-5 w-5 mr-2" />
+                          Upload Report
+                        </Button>
+                      </Link>
                     </motion.div>
                     <motion.div
                       whileHover={{ scale: 1.02 }}
