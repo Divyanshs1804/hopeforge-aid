@@ -57,10 +57,12 @@ export const Hero = () => {
               size="lg" 
               variant="outline-light"
               className="font-heading font-semibold text-lg px-8 py-6 rounded-full transition-all hover:scale-105"
-              onClick={() => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' })}
+              asChild
             >
-              <PlayCircle className="mr-2 h-5 w-5" />
-              View Demo
+              <Link to="/dashboard">
+                <PlayCircle className="mr-2 h-5 w-5" />
+                View Demo
+              </Link>
             </Button>
           </motion.div>
         </div>
