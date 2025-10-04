@@ -14,13 +14,307 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      children: {
+        Row: {
+          age: number | null
+          allergies: string[] | null
+          blood_group: string | null
+          chronic_conditions: string[] | null
+          created_at: string | null
+          gender: string | null
+          height_cm: number | null
+          id: string
+          name: string
+          updated_at: string | null
+          vaccine_status: string | null
+          vaccines_due: string[] | null
+          weight_kg: number | null
+        }
+        Insert: {
+          age?: number | null
+          allergies?: string[] | null
+          blood_group?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          name: string
+          updated_at?: string | null
+          vaccine_status?: string | null
+          vaccines_due?: string[] | null
+          weight_kg?: number | null
+        }
+        Update: {
+          age?: number | null
+          allergies?: string[] | null
+          blood_group?: string | null
+          chronic_conditions?: string[] | null
+          created_at?: string | null
+          gender?: string | null
+          height_cm?: number | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+          vaccine_status?: string | null
+          vaccines_due?: string[] | null
+          weight_kg?: number | null
+        }
+        Relationships: []
+      }
+      document_chunks: {
+        Row: {
+          child_id: string | null
+          chunk_index: number | null
+          chunk_text: string
+          created_at: string | null
+          id: string
+          metadata: Json | null
+          report_id: string | null
+        }
+        Insert: {
+          child_id?: string | null
+          chunk_index?: number | null
+          chunk_text: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          report_id?: string | null
+        }
+        Update: {
+          child_id?: string | null
+          chunk_index?: number | null
+          chunk_text?: string
+          created_at?: string | null
+          id?: string
+          metadata?: Json | null
+          report_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "document_chunks_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "document_chunks_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "health_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_embeddings: {
+        Row: {
+          chunk_id: string
+          created_at: string | null
+          embedding: string | null
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          chunk_id: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          chunk_id?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_embeddings_chunk_id_fkey"
+            columns: ["chunk_id"]
+            isOneToOne: false
+            referencedRelation: "document_chunks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      health_reports: {
+        Row: {
+          child_id: string
+          created_at: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          processed: boolean | null
+          report_date: string | null
+          report_type: string | null
+        }
+        Insert: {
+          child_id: string
+          created_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          processed?: boolean | null
+          report_date?: string | null
+          report_type?: string | null
+        }
+        Update: {
+          child_id?: string
+          created_at?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          processed?: boolean | null
+          report_date?: string | null
+          report_type?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "health_reports_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      queries_log: {
+        Row: {
+          child_id: string | null
+          context_chunks: Json | null
+          created_at: string | null
+          id: string
+          query_text: string
+          response_text: string | null
+          user_id: string | null
+        }
+        Insert: {
+          child_id?: string | null
+          context_chunks?: Json | null
+          created_at?: string | null
+          id?: string
+          query_text: string
+          response_text?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          child_id?: string | null
+          context_chunks?: Json | null
+          created_at?: string | null
+          id?: string
+          query_text?: string
+          response_text?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "queries_log_child_id_fkey"
+            columns: ["child_id"]
+            isOneToOne: false
+            referencedRelation: "children"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      binary_quantize: {
+        Args: { "": string } | { "": unknown }
+        Returns: unknown
+      }
+      halfvec_avg: {
+        Args: { "": number[] }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      l2_norm: {
+        Args: { "": unknown } | { "": unknown }
+        Returns: number
+      }
+      l2_normalize: {
+        Args: { "": string } | { "": unknown } | { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_out: {
+        Args: { "": unknown }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: { "": unknown }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
+      vector_avg: {
+        Args: { "": number[] }
+        Returns: string
+      }
+      vector_dims: {
+        Args: { "": string } | { "": unknown }
+        Returns: number
+      }
+      vector_norm: {
+        Args: { "": string }
+        Returns: number
+      }
+      vector_out: {
+        Args: { "": string }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: { "": string }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: { "": unknown[] }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
