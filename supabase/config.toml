@@ -1,1 +1,13 @@
 project_id = "pgwdozuvtpvjcrvtgscr"
+
+[functions.upload-health-report]
+verify_jwt = false
+
+[functions.process-document]
+verify_jwt = false
+
+[functions.rag-query]
+verify_jwt = false
+
+[functions.child-specific-query]
+verify_jwt = false
