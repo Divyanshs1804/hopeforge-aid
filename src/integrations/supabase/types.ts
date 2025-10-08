@@ -279,6 +279,20 @@ export type Database = {
         Args: { "": string } | { "": unknown } | { "": unknown }
         Returns: unknown
       }
+      match_health_embeddings: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          chunk_id: string
+          chunk_text: string
+          id: string
+          metadata: Json
+          similarity: number
+        }[]
+      }
       sparsevec_out: {
         Args: { "": unknown }
         Returns: unknown

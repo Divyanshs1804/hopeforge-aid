@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Upload, FileText, ArrowLeft } from "lucide-react";
+import { Upload, FileText, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,15 +14,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const UploadReport = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { toast } = useToast();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [childName, setChildName] = useState("");
   const [reportDate, setReportDate] = useState("");
   const [reportType, setReportType] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -50,21 +55,49 @@ const UploadReport = () => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder for backend integration
-    // TODO: Upload file to storage
-    // TODO: Send metadata to database
-    // TODO: Trigger OCR + LLM processing
-    console.log("Form submitted:", {
-      file: selectedFile,
-      childName,
-      reportDate,
-      reportType,
-    });
-    
-    // Navigate back to child profile after submission
-    navigate(`/child/${id}`);
+    if (!selectedFile || !childName || !reportDate || !reportType || !id) return;
+
+    setIsUploading(true);
+    setUploadProgress("Uploading file...");
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('childId', id);
+      formData.append('childName', childName);
+      formData.append('reportDate', reportDate);
+      formData.append('reportType', reportType);
+
+      const { data, error } = await supabase.functions.invoke('upload-health-report', {
+        body: formData,
+      });
+
+      if (error) throw error;
+
+      setUploadProgress("Processing document...");
+      
+      toast({
+        title: "Success!",
+        description: data.message || "Report uploaded and processing started",
+      });
+
+      setTimeout(() => {
+        navigate(`/child/${id}`);
+      }, 1500);
+
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Upload Failed",
+        description: error instanceof Error ? error.message : "Failed to upload report",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploading(false);
+      setUploadProgress("");
+    }
   };
 
   return (
@@ -258,9 +291,16 @@ const UploadReport = () => {
             <Button
               type="submit"
               className="flex-1 bg-primary hover:bg-primary/90"
-              disabled={!selectedFile || !childName || !reportDate || !reportType}
+              disabled={!selectedFile || !childName || !reportDate || !reportType || isUploading}
             >
-              Submit Report
+              {isUploading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {uploadProgress}
+                </>
+              ) : (
+                "Submit Report"
+              )}
             </Button>
           </motion.div>
         </form>

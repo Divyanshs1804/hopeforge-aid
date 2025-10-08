@@ -40,6 +40,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { AIChat } from "@/components/AIChat";
 
 // Mock data for child profiles
 const mockChildData: Record<string, any> = {
@@ -704,7 +705,7 @@ const ChildProfile = () => {
             </motion.section>
           </div>
 
-          {/* Sidebar: AI Assistant Placeholder */}
+          {/* AI Assistant */}
           <motion.aside
             className="lg:sticky lg:top-6 lg:self-start"
             initial={{ opacity: 0, x: 20 }}
@@ -715,44 +716,17 @@ const ChildProfile = () => {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-accent">
                   <Bot className="h-6 w-6" />
-                  AI Assistant
+                  AI Health Assistant
                 </CardTitle>
-                <Badge variant="outline" className="w-fit">
-                  Coming Soon
-                </Badge>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Ask if the child has upcoming vaccines or confirm past
-                  treatments…
+              <CardContent>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Ask questions about {child.name}'s health, vaccination history, and medical records
                 </p>
-                <div className="space-y-3">
-                  <Input
-                    placeholder="Ask about this child's health..."
-                    value={aiQuery}
-                    onChange={(e) => setAiQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleAskAI()}
-                    disabled
-                    className="bg-card"
-                  />
-                  <Button
-                    onClick={handleAskAI}
-                    disabled
-                    className="w-full"
-                    size="lg"
-                  >
-                    <Send className="h-4 w-4 mr-2" />
-                    Ask AI
-                  </Button>
-                </div>
-                <div className="pt-4 border-t border-border">
-                  <p className="text-xs text-muted-foreground">
-                    This AI assistant will help you quickly retrieve
-                    information about {child.name}'s health records, vaccination
-                    history, and medical documents.
-                  </p>
-                </div>
-                {/* TODO: This section will be used for LLM/RAG integration */}
+                <AIChat 
+                  childId={id} 
+                  placeholder={`Ask about ${child.name}'s health...`}
+                />
               </CardContent>
             </Card>
           </motion.aside>

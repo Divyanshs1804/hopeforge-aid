@@ -26,6 +26,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { AIChat } from "@/components/AIChat";
 
 // Mock data for stats cards
 const statsData = [
@@ -345,16 +354,28 @@ const Dashboard = () => {
                   </Button>
                 </motion.div>
 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  <Button
-                    onClick={handleAskAI}
-                    variant="outline-accent"
-                    className="w-full h-auto py-4 flex flex-col items-center gap-2"
-                  >
-                    <Bot className="h-6 w-6" />
-                    <span className="text-sm font-medium">Ask AI Assistant</span>
-                  </Button>
-                </motion.div>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                      <Button
+                        variant="outline"
+                        className="w-full h-auto py-4 flex flex-col items-center gap-2"
+                      >
+                        <Bot className="h-6 w-6" />
+                        <span className="text-sm font-medium">Ask AI Assistant</span>
+                      </Button>
+                    </motion.div>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>AI Health Assistant</DialogTitle>
+                      <DialogDescription>
+                        Ask me about children's health records, vaccines, or anything else
+                      </DialogDescription>
+                    </DialogHeader>
+                    <AIChat placeholder="Ask about health records, vaccines..." />
+                  </DialogContent>
+                </Dialog>
               </div>
             </CardContent>
           </Card>
