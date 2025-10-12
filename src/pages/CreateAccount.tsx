@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Building2, User, Mail, Lock, Building, UserCog } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const CreateAccount = () => {
   const navigate = useNavigate();
@@ -20,6 +21,7 @@ const CreateAccount = () => {
     role: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -67,34 +69,68 @@ const CreateAccount = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) {
       return;
     }
 
-    // TODO: Connect to backend API for user registration
-    // Example API call structure:
-    // const response = await fetch('/api/register', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: JSON.stringify({
-    //     fullName: formData.fullName,
-    //     email: formData.email,
-    //     password: formData.password,
-    //     orphanageId: formData.orphanageId,
-    //     role: formData.role
-    //   })
-    // });
+    setIsLoading(true);
+    
+    try {
+      // Sign up with Supabase Auth
+      const { data: authData, error: signUpError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/`,
+          data: {
+            full_name: formData.fullName,
+          }
+        }
+      });
 
-    toast({
-      title: "Account Created",
-      description: "Your account has been created successfully!",
-    });
+      if (signUpError) throw signUpError;
 
-    // Redirect to sign in page after successful registration
-    navigate("/signin");
+      if (authData.user) {
+        // Insert profile data
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({
+            user_id: authData.user.id,
+            full_name: formData.fullName,
+            orphanage_id: formData.orphanageId,
+          } as any);
+
+        if (profileError) throw profileError;
+
+        // Insert user role
+        const { error: roleError } = await supabase
+          .from('user_roles')
+          .insert({
+            user_id: authData.user.id,
+            role: formData.role,
+          } as any);
+
+        if (roleError) throw roleError;
+
+        toast({
+          title: "Account created successfully!",
+          description: "Please check your email to verify your account.",
+        });
+        navigate('/signin');
+      }
+    } catch (error: any) {
+      console.error('Sign up error:', error);
+      toast({
+        title: "Error creating account",
+        description: error.message || "An error occurred during sign up. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -271,8 +307,8 @@ const CreateAccount = () => {
             </div>
 
             {/* Create Account Button */}
-            <Button type="submit" className="w-full mt-6" size="lg">
-              Create Account
+            <Button type="submit" className="w-full mt-6" size="lg" disabled={isLoading}>
+              {isLoading ? "Creating Account..." : "Create Account"}
             </Button>
           </form>
 
