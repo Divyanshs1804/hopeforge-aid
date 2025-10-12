@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import ChildProfile from "./pages/ChildProfile";
 import UploadReport from "./pages/UploadReport";
 import SignIn from "./pages/SignIn";
+import CreateAccount from "./pages/CreateAccount";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/create-account" element={<CreateAccount />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/child/:id" element={<ChildProfile />} />
           <Route path="/child/:id/upload-report" element={<UploadReport />} />

@@ -143,13 +143,10 @@ const SignIn = () => {
             Don't have an account?{" "}
             <button
               type="button"
-              className="text-primary hover:underline"
-              onClick={() => {
-                // TODO: Implement registration flow
-                console.log("Contact admin for registration");
-              }}
+              className="text-primary hover:underline font-medium"
+              onClick={() => navigate("/create-account")}
             >
-              Contact Admin
+              Create Account
             </button>
           </p>
         </div>
