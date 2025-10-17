@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,14 @@ import { supabase } from "@/integrations/supabase/client";
 const CreateAccount = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",

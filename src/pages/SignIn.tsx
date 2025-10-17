@@ -1,33 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Building2, Lock } from "lucide-react";
+import { Building2, Mail, Lock } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const SignIn = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
-    orphanageId: "",
-    orphanageName: "",
+    email: "",
     password: "",
   });
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Redirect to dashboard if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    // TODO: Connect with backend orphanage authentication service
-    // Placeholder validation
-    if (!formData.orphanageId || !formData.orphanageName || !formData.password) {
+    if (!formData.email || !formData.password) {
       setError("All fields are required");
       return;
     }
 
-    // Redirect to dashboard (no real auth yet)
-    navigate("/dashboard");
+    setIsLoading(true);
+
+    try {
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (signInError) throw signInError;
+
+      if (data.user) {
+        toast({
+          title: "Welcome back!",
+          description: "You have successfully signed in.",
+        });
+        navigate("/dashboard");
+      }
+    } catch (error: any) {
+      console.error('Sign in error:', error);
+      setError(error.message || "Invalid email or password. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,32 +93,21 @@ const SignIn = () => {
           </h2>
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Orphanage ID */}
+            {/* Email */}
             <div className="space-y-2">
-              <Label htmlFor="orphanageId">Orphanage ID</Label>
-              <Input
-                id="orphanageId"
-                name="orphanageId"
-                type="text"
-                placeholder="Enter your orphanage ID"
-                value={formData.orphanageId}
-                onChange={handleChange}
-                className="w-full"
-              />
-            </div>
-
-            {/* Orphanage Name */}
-            <div className="space-y-2">
-              <Label htmlFor="orphanageName">Orphanage Name</Label>
-              <Input
-                id="orphanageName"
-                name="orphanageName"
-                type="text"
-                placeholder="Enter your orphanage name"
-                value={formData.orphanageName}
-                onChange={handleChange}
-                className="w-full"
-              />
+              <Label htmlFor="email">Email Address</Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full pl-10"
+                />
+              </div>
             </div>
 
             {/* Password */}
@@ -133,8 +153,8 @@ const SignIn = () => {
             </div>
 
             {/* Sign In Button */}
-            <Button type="submit" className="w-full" size="lg">
-              Sign In
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 
