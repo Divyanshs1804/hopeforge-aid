@@ -2,10 +2,13 @@ import { createContext, useContext, useEffect, useState, ReactNode } from 'react
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
+type AppRole = 'admin' | 'staff' | 'volunteer';
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  signUp: (email: string, password: string, fullName: string, orphanageId: string, designation: AppRole) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -48,6 +51,36 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return () => subscription.unsubscribe();
   }, []);
 
+
+  const signUp = async (
+    email: string,
+    password: string,
+    fullName: string,
+    orphanageId: string,
+    designation: AppRole
+  ) => {
+    const { data, error } = await supabase.auth.signUp({ email, password });
+    if (error) throw error;
+    if (data.user) {
+      // Insert profile row after signup
+      await supabase.from('profiles').insert({
+        user_id: data.user.id,
+        full_name: fullName,
+        orphanage_id: orphanageId,
+      });
+      // Insert user role
+      await supabase.from('user_roles').insert({
+        user_id: data.user.id,
+        role: designation as AppRole,
+      });
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
@@ -56,6 +89,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     user,
     session,
     loading,
+    signUp,
+    signIn,
     signOut,
   };
 

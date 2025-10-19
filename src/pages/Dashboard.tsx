@@ -225,13 +225,20 @@ const Dashboard = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="container mx-auto px-6">
-          <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-2">
-            Orphanage Dashboard
-          </h1>
-          <p className="text-muted-foreground text-lg">
-            Manage children's health, reports, and alerts
-          </p>
+        <div className="container mx-auto px-6 flex items-center justify-between">
+          <div>
+            <h1 className="font-heading text-4xl md:text-5xl font-bold text-foreground mb-2">
+              Orphanage Dashboard
+            </h1>
+            <p className="text-muted-foreground text-lg">
+              Manage children's health, reports, and alerts
+            </p>
+          </div>
+          <Link to="/profile">
+            <Button variant="default" size="lg" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition font-semibold shadow-md">
+              My Profile
+            </Button>
+          </Link>
         </div>
       </motion.header>
 
