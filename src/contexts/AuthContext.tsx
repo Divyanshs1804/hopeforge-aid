@@ -68,11 +68,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         full_name: fullName,
         orphanage_id: orphanageId,
       });
-      // Insert user role
-      await supabase.from('user_roles').insert({
-        user_id: data.user.id,
-        role: designation as AppRole,
-      });
+      // Insert user role (non-blocking in case RLS forbids insert)
+      try {
+        await supabase.from('user_roles').insert({
+          user_id: data.user.id,
+          role: designation as AppRole,
+        });
+      } catch (e) {
+        // Ignore errors for role insertion to not block signup
+        console.warn('Role insert skipped or failed due to RLS:', e);
+      }
     }
   };
 

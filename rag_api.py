@@ -3,15 +3,12 @@
 import os
 from dotenv import load_dotenv
 load_dotenv()
-import pinecone
-from pinecone import ServerlessSpec
+from pinecone import Pinecone, ServerlessSpec
 
 if 'PINECONE_API_KEY' in os.environ:
-    pinecone.init(api_key=os.environ['PINECONE_API_KEY'])
+    pc = Pinecone(api_key=os.environ['PINECONE_API_KEY'])
 else:
     raise ValueError('PINECONE_API_KEY not found in environment. Please set it in your .env file.')
-
-pc = pinecone.Pinecone()
 
 def get_or_create_child_index(child_id: str, dimension: int = 1536) -> str:
     index_name = f"child_{child_id}"
@@ -49,6 +46,7 @@ class QueryRequest(BaseModel):
     question: str
     child_id: str = None
 
+
 @app.post("/ask-ai")
 async def ask_ai(request: QueryRequest):
     # Use child_id to select Pinecone index
@@ -57,19 +55,17 @@ async def ask_ai(request: QueryRequest):
 
     index_name = get_or_create_child_index(request.child_id)
     # Load embeddings and set up retriever
-    from langchain_openai import OpenAIEmbeddings
+    from langchain_openai import OpenAIEmbeddings, ChatOpenAI
     from langchain_pinecone import PineconeVectorStore
+    from langchain.memory import ConversationBufferMemory
+    from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+
     embeddings = OpenAIEmbeddings(model='text-embedding-3-small', dimensions=1536)
     vector_store = PineconeVectorStore.from_existing_index(index_name, embeddings)
     retriever = vector_store.as_retriever(search_type='similarity', search_kwargs={'k': 5})
 
-    # Set up ConversationalRetrievalChain
-    from langchain_openai import ChatOpenAI
-    from langchain.chains import ConversationalRetrievalChain
-    from langchain.memory import ConversationBufferMemory
-    from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
     llm = ChatOpenAI(model='gpt-4.1-nano', temperature=0)
-    memory = ConversationBufferMemory(memory_key='chat_history', return_message=True)
+    memory = ConversationBufferMemory(memory_key='chat_history', return_messages=True)
     system_template = r'''
     Use the following pieces of context to answer the user's questions.
     If you don’t find the answer in the provided context, just say “I don’t know”.
@@ -85,48 +81,13 @@ async def ask_ai(request: QueryRequest):
         HumanMessagePromptTemplate.from_template(user_template)
     ]
     qna_prompt = ChatPromptTemplate.from_messages(messages)
-    crc = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        memory=memory,
-        combine_docs_chain_kwargs={'prompt': qna_prompt},
-        chain_type='stuff',
-        verbose=True
-    )
-    answer = crc.invoke({"question": request.question})
-    return {"answer": answer}
 
-# RAG and LangChain code (as provided)
-from langchain_openai import ChatOpenAI
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferMemory
-from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+    # Retrieve relevant docs
+    docs = retriever.get_relevant_documents(request.question)
+    context = "\n".join([doc.page_content for doc in docs])
+    chat_history = []  # You may want to persist this per user/session
+    prompt = qna_prompt.format(context=context, question=request.question, chat_history=chat_history)
+    response = llm.invoke(prompt)
+    return {"answer": response.content}
 
-# Initialize LLM and retriever here (these will be dynamically loaded)
-llm = ChatOpenAI(model='gpt-4.1-nano', temperature=0)
-vector_store = None  # Placeholder; load dynamically later if needed
-retriever = None if not vector_store else vector_store.as_retriever(search_type='similarity', search_kwargs={'k': 5})
-memory = ConversationBufferMemory(memory_key='chat_history', return_message=True)
-system_template = r'''
-Use the following pieces of context to answer the user's questions.
-If you don’t find the answer in the provided context, just say “I don’t know”.
--------------
-Context:```{context}```
-'''
-user_template = '''
-Question : ```{question}```
-Chat history : ```{chat_history}```
-'''
-messages = [
-    SystemMessagePromptTemplate.from_template(system_template),
-    HumanMessagePromptTemplate.from_template(user_template)
-]
-qna_prompt = ChatPromptTemplate.from_messages(messages)
-crc = ConversationalRetrievalChain.from_llm(
-    llm=llm,
-    retriever=retriever,
-    memory=memory,
-    combine_docs_chain_kwargs={'prompt': qna_prompt},
-    chain_type='stuff',
-    verbose=True
-)
+
